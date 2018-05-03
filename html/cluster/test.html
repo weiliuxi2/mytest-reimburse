@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <style>
+        .check-result {
+            color: #fb6262;
+        }
+
+    </style>
+</head>
+<body>
+<h1>test</h1>
+
+<div ng-app="test" ng-controller="myTest" class="content-zone">
+    <div>
+        <input type="text" class="layui-input" name="a">
+    </div>
+    <div>
+        <input type="text" name="b">
+    </div>
+
+
+    <form name="usrMgrForm">
+
+        <div class="form-group">
+            <label for="userPassword">密码</label>
+            <input type="password" class="form-control" id="userPassword" name="userPassword"
+                   placeholder="请输入密码" ng-model="selectedUser.userPassword">
+        </div>
+
+    <div class="form-group has-feedback"
+         ng-class="{'has-success' : !usrMgrForm.confirmPassword.$pristine && usrMgrForm.confirmPassword.$valid,
+                'has-error' : !usrMgrForm.confirmPassword.$pristine && usrMgrForm.confirmPassword.$invalid }">
+        <label for="confirmPassword">确认密码</label>
+        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
+               placeholder="请再次输入密码" ng-model="selectedUser.confirmPassword" pw-check="userPassword">
+
+        <div ng-show="!usrMgrForm.confirmPassword.$pristine && usrMgrForm.confirmPassword.$invalid">
+            <span class="glyphicon glyphicon-remove form-control-feedback">ccc</span>
+        </div>
+    </div>
+
+        <div class="col-md-12">
+            <switch name="enabled" style="width:66px" ng-model="enabled" disabled="false" ng-change="switchChange(enabled)" on="开始" off="结束"></switch>
+            <switch name="enabled" style="width:155px" ng-model="enabled" disabled="false" ng-change="switchChange(enabled)" on="这边是开始的意思" off="这边是结束的意思"></switch>
+        </div>
+    </form>
+</div>
+</body>
+
+<script src="../common/js/jquery.min.js"></script>
+<script src="../common/js/angular-1.6.5/angular.min.js"></script>
+<script src="../common/js/angular-1.6.5/angular-resource.js"></script>
+<script src="../common/ui/layui/lay/dest/layui.all.js"></script>
+<script src="./js/test.js"></script>
+</html>

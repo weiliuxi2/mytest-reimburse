@@ -1,0 +1,193 @@
+.header{
+	padding-bottom: 8px;
+	margin-bottom: 10px;
+	border-bottom: 1px solid #e5e5e5;
+	font-size: 16px;
+	font-weight: 600;
+}
+.header .devide{
+	text-align: center;
+	width: 20px;
+	color: #e5e5e5;
+}
+.layui-show{
+	display: block !important;
+}
+.info-block .knob{
+	border: none;
+}
+.cluster-name{
+	font-size: 16px;
+	font-weight: 600;
+}
+.cluster-name .badge-primary{
+	display: none;
+}
+.serverstatus-td .badge-primary{
+	display: none;
+	width: 80px;
+	margin: 0 auto
+}
+.badge-primary{
+	border: none;	
+	border-radius: 10px;
+	padding: 0px 8px;
+	line-height: 20px;
+	height: 21px;
+	color: #fff;
+	font-size: 10px;
+	margin-left: 0px;
+	position: relative;
+	display: inline-block;
+}
+.bgred
+{
+	background: red;
+}
+.bggreen
+{
+	background: #5fb878;
+}
+.bgblue
+{
+	background: #1e9fff;
+}
+.bgMonitorSelect
+{
+	background:#107326;
+}
+.info-block{
+	margin-left: -8px;
+	margin-right: -8px;
+}
+.info-block .list{
+	display: inline-block;
+	float: left;
+	border-radius: 2px;
+	border: 1px solid #e5e5e5;
+	margin: 10px 5px;
+	text-align: center;
+}
+.wid-135{
+	width: 135px;
+}
+.info-block .cpu-info,.info-block .memory-info{
+	width: 290px;
+}
+.info-block .list{
+	height: 130px
+}
+.info-block .list .icon .iconfont{
+	font-size: 25px;
+}
+.info-block .list .icon{
+	margin-top: 21px;
+	margin-bottom: 12px;
+}
+.info-block .list .count{
+	font-size: 19px;
+	margin-bottom: 15px;
+	height: 25px
+}
+.info-block .list .title{
+	background: rgb(245,245,245);
+	padding: 5px;
+	height: 20px;
+}
+.info-block .list .cpu-remain{
+	margin-bottom: 15px;
+}
+.info-block .list .f-right h3{
+	font-size: 21px;
+	font-weight: 600;
+	color: rgb(90,90,90);
+}
+.info-block .cpu-info>*,.info-block .memory-info>*{
+	margin: 12px 10px;
+}
+.basic-info{
+	border: 1px solid #e5e5e5;
+	border-radius: 5px;
+	margin-top: 10px;
+	padding: 15px
+}
+.basic-info .layui-elip{
+	width: 320px;
+}
+.basic-info .layui-input-block{
+	margin-left: 170px
+}
+.basic-info h3{
+	color: #333;
+	font-weight: 600;
+	padding-bottom: 7px;
+	border-bottom: 1px solid #e5e5e5;
+}
+.basic-info .layui-form-label{
+	width: 140px;
+}
+.basic-info>.content{
+	padding-top: 16px;
+	padding-bottom: 20px;
+}
+.detail-info{
+	margin-top: 20px;
+	border: 1px solid #e5e5e5;
+	border-radius: 5px;
+	padding: 15px;
+}
+.detail-info .nav{
+	padding-bottom: 7px;
+	margin-bottom: 23px;
+	border-bottom: 1px solid #e5e5e5;
+}
+.detail-info .nav a{
+	padding: 0 10px;
+	padding-bottom: 7px;
+}
+.detail-info .nav a:hover{
+	border-bottom: 2px solid rgb(160,160,160);
+}
+.detail-info .nav a.active{
+	border-bottom: 2px solid #5fb878;
+}
+.detail-info .layui-table{
+	margin-top: 10px;
+}
+.layui-layer-content{
+	padding: 15px;
+}
+#addHost{
+	display: none;
+}
+#serverLabel{
+	display: none;
+}
+#editHost{
+	display: none;
+}
+#podForm{
+	display: none;
+}
+#serviceForm{
+	display: none;
+}
+#floadipForm{
+	display: none;
+}
+#floadIpbutton{
+	display: none;
+}
+#timeSelect button{
+	margin-left:5px;
+	margin-bottom:20px;	
+	width:80px;
+}
+.bgblue
+{
+	background: #1e9fff;
+}
+
+.cluster-name .layui-elip{
+	width: 320px
+}

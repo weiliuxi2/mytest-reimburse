@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-Type" content="text/html; charset=utf-8">
+<title></title>
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+<meta name="renderer" content="webkit" />
+<link rel="stylesheet" href="../common/ui/layui/css/layui.css">
+<link rel="stylesheet" href="./css/detail.css">
+<link rel="stylesheet" href="../common/ui/public/iconfont/iconfont.css">
+<script type="text/javascript">
+
+</script>
+</head>
+
+<body>
+
+	<div ng-app="clusterDetail" ng-controller="myClusterDetail" class="content-zone">
+
+		<div class="header layui-clear">
+			<div class="f-left">
+				<a href="./index.html">集群</a> / 详情
+			</div>
+		</div>
+
+		<div class="action-bar layui-clear">
+			<div class="f-left cluster-name">
+				<span class="badge-primary bgblue" ng-class="{'layui-show':clusterData.status==0}">未部署</span>  
+     			<span class="badge-primary bgblue" ng-class="{'layui-show':clusterData.status==1}">部署中</span> 
+     			<span class="badge-primary bggreen" ng-class="{'layui-show':clusterData.status==2}">运行中</span> 
+     			<span class="badge-primary bgred" ng-class="{'layui-show':clusterData.status==3}">部署失败</span> 
+     			<span class="badge-primary bgred" ng-class="{'layui-show':clusterData.status==4}">删除中</span>
+     			<span class="badge-primary bgred" ng-class="{'layui-show':clusterData.status==5}">异常</span>
+     			<span class="badge-primary bgred" ng-class="{'layui-show':clusterData.status==6}">删除异常</span>
+			</div>
+			<div class="f-right">
+				<button id="deployButton" class="layui-btn layui-btn-small" disabled ng-click="deployCluster()">发布集群</button>
+			</div>
+		</div>
+
+		<div class="info-block layui-clear">
+			<div class="list cpu-info">
+				<div class="f-left">
+					<input class="knob" data-readonly="readonly" data-width="100" data-fgColor="#ffb408" data-thickness="0.1" ng-value="cpuPercent">
+				</div>
+				<div class="f-right">
+					<div class="cpu-remain">
+						<h3><span ng-bind="clusterCpuRemainder"></h3>
+						<div class="des">剩余CPU</div>
+					</div>
+					<div class="cpu-all">
+						<h3><span ng-bind="clusterCpuTotal"></h3>
+						<div class="des">node节点CPU总数(核)</div>
+					</div>
+				</div>
+			</div>
+			<div class="list memory-info">
+				<div class="f-left">
+					<input class="knob" data-readonly="readonly" data-width="100" data-fgColor="#ffb408" data-thickness="0.1"  ng-value="memPercent">
+				</div>
+				<div class="f-right">
+					<div class="cpu-remain">
+						<h3><span ng-bind="clusterMemRemainder"></h3>
+						<div class="des">剩余内存</div>
+					</div>
+					<div class="cpu-all">
+						<h3><span ng-bind="clusterMemTotal"></h3>
+						<div class="des">node节点内存总数(M)</div>
+					</div>
+				</div>
+			</div>
+			<div class="list wid-135">
+				<div class="icon">
+					<i class="iconfont">&#xe634;</i>
+				</div>
+				<div class="count">
+					<span ng-bind="serverTotal"></span>
+				</div>
+				<div class="title">主机总数</div>
+			</div>
+			
+			<div class="list wid-135">
+				<div class="icon">
+					<i class="iconfont">&#xe60d;</i>
+				</div>
+				<div class="count">
+					<span ng-bind="podTotal">
+				</div>
+				<div class="title">pods</div>
+			</div>
+			<div class="list wid-135">
+			<a ng-click="serviceCheck()" href="#" >
+				<div class="icon">
+					<i class="iconfont">&#xe61b;</i>
+				</div>
+				<div class="count">
+					<span ng-bind="serviceTotal">
+				</div>
+				<div class="title">服务总数</div>
+			</a>
+			</div>
+		</div>
+
+
+		<div class="basic-info layui-clear">
+			<h3>基本信息</h3>
+			<div class="content layui-clear">
+				<div class="f-left" style="width:50%">
+
+					<div class="layui-form-item">
+					    <label class="layui-form-label">集群名称：</label>
+					    <div class="layui-input-block">
+					      	<div class="layui-form-mid">
+					      		<span title="{{clusterData.clusterName}}" ng-bind="clusterData.clusterName" class="layui-inline layui-elip"></span>
+					      	</div>
+					    </div>
+				  	</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label">Iaas环境：</label>
+						<div class="layui-input-block">
+							<div class="layui-form-mid">
+								<span title="{{clusterData.iaasEnvInfo}}" ng-bind="clusterData.iaasEnvInfo" class="layui-inline layui-elip"></span>
+							</div>
+						</div>
+					</div>
+
+
+				  	<div class="layui-form-item">
+					    <label class="layui-form-label">是否安装网络工具：</label>
+					    <div class="layui-input-block">
+					      	<div class="layui-form-mid">
+					      		<span class="layui-hide" ng-class="{'layui-show':clusterData.isInstallNetworkTools==1}">是</span> 
+								<span class="layui-hide" ng-class="{'layui-show':clusterData.isInstallNetworkTools==2}">否</span>
+					      	</div>
+					    </div>
+				  	</div>
+
+				  	<div class="layui-form-item">
+					    <label class="layui-form-label">创建时间：</label>
+					    <div class="layui-input-block">
+					      	<div class="layui-form-mid">
+					      		<span ng-bind="clusterData.createDate | date:'yyyy-MM-dd HH:mm:ss'"></span>
+					      	</div>
+					    </div>
+				  	</div>
+					
+					<div class="layui-form-item">
+					    <label class="layui-form-label">DNS：</label>
+					    <div class="layui-input-block">
+					      	<div class="layui-form-mid">
+					      		<span title="{{clusterData.dns}}" ng-bind="clusterData.dns" class="layui-inline layui-elip"></span>
+					      	</div>
+					    </div>
+				  	</div>
+
+		
+					
+				</div>
+				<div class="f-left" style="width:50%">
+
+					<div class="layui-form-item">
+					    <label class="layui-form-label">所属项目：</label>
+					    <div class="layui-input-block">
+					      	<div class="layui-form-mid">
+					      		<span ng-bind="clusterData.projectName"></span>
+					      	</div>
+					    </div>
+				  	</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label">Paas环境：</label>
+						<div class="layui-input-block">
+							<div class="layui-form-mid">
+								<span title="{{clusterData.paasEnvInfo}}" ng-bind="clusterData.paasEnvInfo" class="layui-inline layui-elip"></span>
+							</div>
+						</div>
+					</div>
+
+
+
+				  	<div class="layui-form-item">
+					    <label class="layui-form-label">描述信息：</label>
+					    <div class="layui-input-block">
+					      	<div class="layui-form-mid">
+					      		<span title="{{clusterData.description}}" ng-bind="clusterData.description" class="layui-inline layui-elip"></span>
+					      	</div>
+					    </div>
+				  	</div>
+
+				  	<div class="layui-form-item">
+					    <label class="layui-form-label">是否高可用：</label>
+					    <div class="layui-input-block">
+					      	<div class="layui-form-mid">
+					      		<span class="layui-hide" ng-class="{'layui-show':clusterData.isHA==2}">否</span>
+								<span class="layui-hide" ng-class="{'layui-show':clusterData.isHA==1}">是	
+									<span class="red">(master节点不能少于3个)</span>
+								</span>
+					      	</div>
+					    </div>
+				  	</div>
+				  	
+				  	<div class="line" id="floadip-show" style="display:none">
+						<label class="layui-form-label"><label style="color: red">*</label>浮动IP：</label>
+						<div class="layui-input-block">
+							<div class="layui-form-mid">
+					      		<span ng-bind="clusterData.floadIp"></span>
+					      	</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="detail-info">
+			<div class="layui-clear nav">
+				<a class="active" data-nav="host" href="javascript:;">主机</a> 
+				<a data-nav="monitor" href="javascript:;">监控</a> 
+				<a data-nav="storage" href="javascript:;">存储</a>
+			</div>
+			<div class="nav-content">
+				<div id="host">
+					<div class="layui-clear action-bar">
+						<div class="f-left">
+							<input type="text" class="layui-input" ng-model="queryServer"
+								placeholder="支持过滤IP">
+						</div>
+						<div class="f-right">
+							<button id="floadIpbutton"
+								class="layui-btn layui-btn-small" 
+								ng-click="modifyFloadip()">浮动&nbsp;IP</button>
+							<button id="addButton" class="layui-btn layui-btn-small" ng-click="addHost()">添加主机</button>
+							<button id="delbutton"
+								class="layui-btn layui-btn-small" disabled
+								ng-click="delHost()">删除主机</button>
+							<button id="updatebutton"
+								class="layui-btn layui-btn-small" disabled
+								ng-click="updateHost()">更新主机</button>
+							<button id="joinbutton"
+								class="layui-btn layui-btn-small" disabled
+								ng-click="joinCluster()">接入集群</button>
+							<button id="refreshbutton"
+								class="layui-btn layui-btn-small" ng-click="refreshClusterServer()">刷新</button>
+						</div>
+					</div>
+					<table class="layui-table" id="serverTable">
+						<thead>
+							<th style="width:4%" class="text-center">
+								<!--<input type="checkbox" class="checkinput" id="allselect" onclick="checkAll(this)">-->
+								<input type="checkbox" ng-click="selectAll()" ng-checked="selectedAll">
+							</th>
+							<th>主机名</th>
+							<th class="text-center">主机IP</th>
+							<th class="text-center">状态</th>
+							<th class="text-center">CPU(核)</th>
+							<th class="text-center">内存大小(M)</th>
+							<th class="text-center">磁盘大小(G)</th>
+							<th class="text-center">主机类型</th>
+							<th class="text-center" ng-if="clusterStatus != 0 && clusterStatus !=1 && clusterStatus !=3">标签</th>
+						</thead>
+						<tbody>
+							<tr ng-repeat="server in serverList  | filter: {serverIP : queryServer}"
+								class="server-tr">
+								<!--<td class="text-center"><input type="checkbox" target_id="{{server.id}}"-->
+									<!--class="checkinput" onclick="checkServer(this)"></td>-->
+								<td class="text-center">
+									<input type="checkbox" class="checkinput" ng-click="select(server)" ng-checked="server.selected" ng-value="server.id">
+								</td>
+								<td class="servername-td" id="{{server.serverName}}"><span
+									ng-bind="server.serverName"></span></td>
+								<td class="serverip-td text-center" id="{{server.serverIP}}">
+									<span ng-bind="server.serverIP"></span> </td>
+								<td class="serverstatus-td text-center" id="{{server.status}}">
+									<span class="badge-primary bgblue" ng-class="{'layui-show':server.status==0}">未接入</span>
+									<span class="badge-primary bgblue" ng-class="{'layui-show':server.status==1}">部署中</span>
+									<span class="badge-primary bggreen" ng-class="{'layui-show':server.status==2}">运行</span>
+									<span class="badge-primary bgred" ng-class="{'layui-show':server.status==3}">部署失败</span>
+									<span class="badge-primary bgred" ng-class="{'layui-show':server.status==4}">删除中</span>
+									<span class="badge-primary bgred" ng-class="{'layui-show':server.status==5}">异常</span>
+									<span class="badge-primary bgred" ng-class="{'layui-show':server.status==6}">删除异常</span>
+								</td>
+								<td class="text-center"><span ng-bind="server.cpu"></span></td>
+								<td class="text-center"><span ng-bind="server.memory"></span></td>
+								<td class="text-center"><span ng-bind="server.disk"></span></td>
+								<td class="servertype-td text-center" id="{{server.serverType}}">
+									<span ng-if="server.serverType == 1" class="master">master</span>
+									<span ng-if="server.serverType == 2" class="node">node</span>
+								</td>
+								<td class="text-center" ng-if="clusterStatus != 0 && clusterStatus !=1 && clusterStatus !=3">
+									<a href="#" title="{{server.nodeLabel}}"  ng-click="openLabelWindow(server.serverName,server.status)">
+										<span  ng-if="server.nodeLabel == '' || server.nodeLabel == null" >标签</span>
+										<span  ng-if="server.nodeLabel != ''" ng-bind="server.nodeLabel"></span>
+									</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<div id="monitor" >
+					<div id="timeSelect" style="display:none;">
+						<button id="10mButton" class="layui-btn layui-btn-small bgMonitorSelect" ng-click="monitor($event,'10m')">10分钟</button>
+						<button class="layui-btn layui-btn-small" ng-click="monitor($event,'1h')">1小时</button>
+						<button class="layui-btn layui-btn-small" ng-click="monitor($event,'6h')">6小时</button>
+						<button class="layui-btn layui-btn-small" ng-click="monitor($event,'1d')">1天</button>
+						<button class="layui-btn layui-btn-small" ng-click="monitor($event,'7d')">7天</button>
+						<button class="layui-btn layui-btn-small" ng-click="monitor($event,'30d')">30天</button>
+					</div>
+					<div id="mainCPU" style="height: 300px"></div>
+					<div id="mainMem" style="height: 320px"></div>
+					<div id="mainDisk2" style="height: 350px"></div>
+				</div>
+				<div id="storage">
+					<form id="storageForm" name="storageForm">
+						<input type="hidden" name="id" id="storageId" ng-model="clusterStorage.id">
+						<div class="layui-form-item">
+							<label class="layui-form-label"><font color="red">*</font>用户名</label>
+								<div class="layui-input-block">
+								<input type="text" name="storageUserName" id="storageUserName" ng-model="clusterStorage.storageUserName" class="layui-input" > 
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label"><font color="red">*</font>密&nbsp;&nbsp;&nbsp;码</label>
+							<div class="layui-input-block">
+								<input type="password" name="storagePassword" id="storagePassword" ng-model="clusterStorage.storagePassword" class="layui-input" > 
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label"><font color="red">*</font>存储集群ID</label>
+								<div class="layui-input-block">
+								<input type="text" name="storageClusterId" id="storageClusterId" ng-model="clusterStorage.storageClusterId" 
+								placeholder="只允许输入字母，数字；最大长度50" class="layui-input" > 
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label"><font color="red">*</font>访问地址</label>
+								<div class="layui-input-block">
+								<input type="text" name="storageAddr" id="storageAddr" ng-model="clusterStorage.storageAddr" 
+								placeholder="格式：http://10.10.10.114:8080" class="layui-input" > 
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<div class="layui-input-block">
+								<button class="layui-btn" id="storageButton" ng-click="saveClusterStorage()">保存</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<form id="addHost" name="hostForm">
+			<div class="layui-form-item">
+				<label class="layui-form-label"><font color="red">*</font>主机名</label>
+				<div class="layui-input-block">
+					<input type="text"  ng-model="server.serverName"  class="layui-input" id="serverName"
+					maxlength="50" placeholder="只能输入小写字母，数字，点号，中划线。最大长度为50" >
+				</div>
+
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><font color="red">*</font>主机IP</label>
+				<div class="layui-input-block">
+					<select class="layui-input" id="serverIP" ng-model="server.serverIP">
+						<option value="">请选择</option>
+						<option ng-repeat="cloudHost in cloudHosts" value="{{cloudHost.ip}}" ng-bind="cloudHost.ip"></option>
+					</select>
+				</div>
+
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><font color="red">*</font>主机类型</label>
+				<div class="layui-input-block">
+					<select class="layui-input"  ng-model="server.serverType" id="serverType">
+						<option value="">请选择</option>
+						<option value="1">master</option>
+						<option value="2">node</option>
+					</select>
+				</div>
+			</div>
+		</form>
+		
+		<form id="editHost" name="editHostForm">
+			<input type="hidden" name="id"  ng-model="editHost.id" class="layui-input">
+			<div class="layui-form-item">
+				<label class="layui-form-label"><font color="red">*</font>主机名</label>
+				<div class="layui-input-block">
+					<input type="text" id="editServerName"  ng-model="editHost.serverName" id="editServerName" class="layui-input"
+					maxlength="50" placeholder="只能输入小写字母，数字，点号，中划线。最大长度为50" >
+				</div>
+
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><font color="red">*</font>主机类型</label>
+				<div class="layui-input-block">
+					<select class="layui-input" id="editServerType" ng-model="editHost.serverType">
+						<option value="">请选择</option>
+						<option value="1">master</option>
+						<option value="2">node</option>
+					</select>
+				</div>
+			</div>
+		</form>
+		
+		<form id="floadipForm" class="layui-form" name="floadipForm" >
+			<div class="layui-form-item">
+				<label class="layui-form-label"><font color="red">*</font>浮动&nbsp;IP</label>
+				<div class="layui-input-block">
+					<input type="text" name="floadIp" id="floadIp"
+						ng-model="floadIp" class="layui-input" autocomplete="off"
+						ng-trim="true" required ip-Valid placeholder="格式：192.168.1.1"> 
+					<span style="color: red"
+						ng-show="floadipForm.floadIp.$dirty && floadipForm.floadIp.$invalid">
+						<span ng-show="floadipForm.floadIp.$error.ipValid">IP输入不正确</span>
+					</span>
+				</div>
+			</div>
+		</form>
+
+
+		<div id="serverLabel">
+			<form id="serverLabelAdd" name="serverLabelAddForm">
+				<div class="layui-form-item">
+					<label class="layui-form-label"><font color="red">*</font>标签key</label>
+					<div class="layui-input-block">
+						<input type="text"  ng-model="labelData.labelKey"  class="layui-input" id="labelAddKey"
+						maxlength="50" placeholder="只能输入字母，数字，点号，中划线，下划线。最大长度为50" >
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label"><font color="red">*</font>标签value</label>
+					<div class="layui-input-block">
+						<input type="text"  ng-model="labelData.labelValue"  class="layui-input" id="labelAddValue"
+						maxlength="50" placeholder="只能输入字母，数字，点号，中划线，下划线。最大长度为50" >
+					</div>
+				</div>
+				<div class="layui-form-item layui-form-text">
+					<div class="layui-input-block">
+						<button class="layui-btn layui-btn-primary" ng-click="addLabel($event)">添加</button>
+					</div>
+				</div>
+			</form>
+			<form id="serverLabelEdit" name="serverLabelEditForm" style="display:none">
+				<div class="layui-form-item">
+					<label class="layui-form-label"><font color="red">*</font>标签key</label>
+					<div class="layui-input-block">
+						<input type="text"  ng-model="labelEditData.labelKey"  class="layui-input" disabled>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label"><font color="red">*</font>标签value</label>
+					<div class="layui-input-block">
+						<input type="text"  ng-model="labelEditData.labelValue"  class="layui-input" id="labelEditValue"
+						maxlength="50" placeholder="只能输入字母，数字，点号，中划线，下划线。最大长度为50" >
+					</div>
+				</div>
+				<div class="layui-form-item layui-form-text">
+					<div class="layui-input-block">
+						<button  class="layui-btn layui-btn-primary" ng-click="updateLabel($event)">修改</button>
+						<button  class="layui-btn layui-btn-primary" ng-click="cancellUpdateLabel($event)">取消</button>
+					</div>
+				</div>
+			</form>
+			<table class="layui-table">
+				<thead>
+					<th class="text-center">标签key</th>
+					<th class="text-center">标签value</th>
+					<th class="text-center" style="width:23%">操作</th>
+				</thead>
+				<tbody>
+					<tr ng-repeat="v in serverLabelList">
+						<td class="text-center">
+							<span ng-bind="v.labelKey" title="{{v.labelKey}}"></span>
+						</td>
+						<td class="text-center">
+							<span ng-bind="v.labelValue" title="{{v.labelValue}}"></span>
+						</td>
+						<td class="text-center">
+							<a href="javascript:;" ng-click="updateServerLabel(v)">修改</a>
+							<a href="javascript:;" ng-click="deleteServerLabel(v.labelKey)">删除</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			
+		</div>
+	</div>
+	
+	
+</body>
+<script src="../common/js/jquery.min.js"></script>
+<script src="../common/js/angular-1.6.5/angular.min.js"></script>
+<script src="../common/js/angular-1.6.5/angular-resource.js"></script>
+<script src="../common/ui/layui/lay/dest/layui.all.js"></script>
+<script src="./js/jquery.knob.js"></script>
+<script src="./js/echarts.js"></script>
+<script src="../common/js/common.js"></script>
+<script src="./js/resources.js"></script>
+<script src="./js/detail.js"></script>
+<script src="./js/monitor.js"></script>
+
+</html>

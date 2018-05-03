@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-Type" content="text/html; charset=utf-8">
+<title></title>
+<meta name="viewport"
+	content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+<meta name="renderer" content="webkit" />
+<link rel="stylesheet" href="../common/ui/layui/css/layui.css">
+<link rel="stylesheet" href="../common/ui/public/iconfont/iconfont.css">
+<link rel="stylesheet" href="./css/index.css">
+
+</head>
+
+<body>
+
+	<div ng-app="cluster" ng-controller="myCluster" class="content-zone">
+
+		<div class="main">
+			<h3 class="title">集群列表</h3>
+			<div class="layui-clear action-bar">
+				<div class="f-left">
+					<div class="f-left">
+						<label class="layui-form-label" style="width:62px;margin-left:-50px;">名称</label>
+						<input type="text" ng-model="queryCluster" placeholder="按名称过滤" class="layui-input" style="width:290px">
+					</div>
+					<region-select template-url="env.html"></region-select>
+				</div>
+				<div class="f-right">
+					<button class="layui-btn" ng-click="createClusterWindow()">创建集群</button>
+				</div>
+			</div>
+			<div class="content">
+				<div class="list" id="{{cluster.id}}"
+					statusattr="{{cluster.status}}"
+					ng-repeat="cluster in data | filter: {clusterName : queryCluster} | filter : {projectName:selectProjectName} | filter : {$:selectPaasEnv}">
+					<div>
+						<div class="list-title">
+							<div class="layui-clear">
+								<div title="{{cluster.clusterName}}" class="f-left"
+									ng-bind="cluster.clusterName | textLengthSet:true:10:'...'"></div>
+								<div class="f-right updateOrDelete layui-hide">
+									<button class="layui-btn layui-btn-small updateCluster"
+										ng-click="updateClusterWindow(cluster.id,cluster.paasEnvId)">更新</button>
+									<button class="layui-btn layui-btn-danger layui-btn-small deleteCluster"
+										ng-click="deleteCluster(cluster.id,cluster.paasEnvId)">删除</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="list2" id="{{cluster.id}}" ng-click="enterDetail(cluster)">
+						<div class="list-main layui-clear">
+							<div class="f-left">创建时间</div>
+							<div class="f-left" ng-bind="cluster.createDate  | date:'yyyy-MM-dd HH:mm:ss' "></div>
+						</div>
+						<div class="list-main layui-clear">
+							<div class="f-left">状态</div>
+							<div class="f-left">
+								<span class="badge-primary bgblue" ng-if="cluster.status == 0">未部署</span>
+								<span class="badge-primary bgblue" ng-if="cluster.status == 1">部署中</span>
+								<span class="badge-primary bggreen" ng-if="cluster.status == 2">运行中</span>
+								<span class="badge-primary bgred" ng-if="cluster.status == 3">部署失败</span>
+								<span class="badge-primary bgred" ng-if="cluster.status == 4">删除中</span>
+								<span class="badge-primary bgred" ng-if="cluster.status == 5">运行异常</span>
+								<span class="badge-primary bgred" ng-if="cluster.status == 6">删除异常</span>
+							</div>
+						</div>
+						<div class="list-main layui-clear">
+							<div class="f-left">所属项目</div>
+							<div class="f-left" ng-bind="cluster.projectName"></div>
+						</div>
+						<div class="list-main layui-clear">
+							<div class="f-left">Paas环境</div>
+							<div class="f-left" ng-bind="cluster.envInfo "></div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+
+		<form id="createCluster" name="clusterForm" class="layui-open-page">
+			<div class="form-block">
+			<div class="layui-form-item">
+				<label class="layui-form-label"><font color="red">*</font>集群名称</label>
+				<div class="layui-input-block">
+					<input type="text" ng-model="clusterData.clusterName" class="layui-input" name="clusterName"
+						placeholder="只能包含中文，英文，数字，下划线，最大长度为50" maxlength="50" >
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label"><font color="red">*</font>所属项目</label>
+				<div class="layui-input-block">
+					<select class="layui-input layui-inline" name="projectName"  ng-model="clusterData.projectName" ng-options="y for (x, y) in projectData"
+							 ng-change="getEnvsByProjectId(clusterData.projectName)" data-check="required" style="width: 300px">
+						<option value="">-- 项目 --</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label"><font color="red">*</font>IaaS环境</label>
+				<div class="layui-input-block">
+					<select class="layui-input layui-inline" name="iaasName" ng-model="clusterData.envIaasName" ng-options="y for (x, y) in projectIaasEnvData"
+							 data-check="required" style="width: 300px">
+						<option value="">-- 环境 --</option>
+						<option ng-repeat="v in typeData" value="{{v.id}}" ng-bind="v.name"></option>
+					</select>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><font color="red">*</font>PaaS环境</label>
+				<div class="layui-input-block">
+				<select class="layui-input layui-inline" name="paasName" ng-model="clusterData.envPaasName" ng-options="y for (x, y) in projectPaasEnvData"
+						data-check="required" style="width: 300px">
+					<option value="">-- 环境 --</option>
+				</select>
+			</div>
+			</div>
+			<div class="layui-form-item layui-form">
+				<label class="layui-form-label">是否安装网络工具</label>
+				<div class="layui-input-block">
+					<input type="checkbox"  ng-model="clusterData.isInstallNetworkTools"  title="是" checked lay-skin="primary" ng-true-value='1' ng-false-value="2">
+				</div>
+			</div>
+
+			<div class="layui-form-item layui-form">
+				<label class="layui-form-label">是否高可用</label>
+				<div class="layui-input-block">
+					<input type="checkbox"  title="是" ng-model="clusterData.isHA" lay-skin="primary" ng-true-value='1' ng-false-value="2">
+				</div>
+			</div>
+
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label"><font color="red">*</font>主机DNS</label>
+				<div class="layui-input-block">
+					<input type="text" ng-model="clusterData.dns" placeholder="格式：11.11.11.11,22.22.22.22" class="layui-input" name="dns">
+				</div>
+			</div>
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label"><font color="red">*</font>时间同步服务器</label>
+				<div class="layui-input-block">
+					<input type="text" ng-model="clusterData.timeServer" placeholder="格式：11.11.11.11" class="layui-input" name="timeServer">
+				</div>
+			</div>
+
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label">描述信息</label>
+				<div class="layui-input-block">
+					<textarea ng-model="clusterData.description" placeholder="最大长度为512" maxlength="512" id="description"
+						class="layui-textarea"></textarea>
+				</div>
+			</div>
+			<!--<div class="layui-form-item layui-form-text">-->
+				<!--<div class="layui-input-block">-->
+					<!--<button class="layui-btn layui-btn-primary" ng-click="configMore($event)">显示高级选项</button>-->
+				<!--</div>-->
+			<!--</div>-->
+			<!--<div id="moreConfig" class="layui-tab-item">-->
+				<!--<div class="layui-form-item layui-form-text">-->
+					<!--<label class="layui-form-label">主机DNS</label>-->
+					<!--<div class="layui-input-block">-->
+						<!--<input type="text" ng-model="clusterData.dns" placeholder="格式：11.11.11.11,22.22.22.22" class="layui-input" name="dns">-->
+					<!--</div>-->
+				<!--</div>-->
+			<!--</div>-->
+			<div class="f-right">
+				<button type="button" class="layui-btn layui-btn-small layui-btn-confirm" ng-click="creeateCluster($event)">保存</button>
+				<button type="button" class="layui-btn layui-btn-small layui-btn-primary" onclick="closeLayer()">取消</button>
+			</div>
+			</div>
+		</form>
+		
+<!-- 		更新集群 -->
+		<form id="editCluster-form" name="edit-clusterForm" class="layui-open-page">
+			<div class="form-block">
+			<div class="layui-form-item">
+				<label class="layui-form-label"><font color="red">*</font>集群名称</label>
+				<div class="layui-input-block">
+					<input type="text" ng-model="editCluster.clusterName" class="layui-input" disabled name="clusterName">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label"><font color="red">*</font>所属项目</label>
+				<div class="layui-input-block">
+					<input type="text" ng-model="editCluster.projectName" class="layui-input" disabled>
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label"><font color="red">*</font>Iaas环境</label>
+				<div class="layui-input-block">
+					<input type="text" ng-model="editCluster.iaasEnvInfo" class="layui-input" disabled>
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label"><font color="red">*</font>Paas环境</label>
+				<div class="layui-input-block">
+					<input type="text" ng-model="editCluster.paasEnvInfo" class="layui-input" disabled>
+				</div>
+			</div>
+
+			<div class="layui-form-item layui-form">
+				<label class="layui-form-label">是否安装网络工具</label>
+				<div class="layui-input-block">
+					<input type="checkbox"  ng-model="editCluster.isInstallNetworkTools"  title="是"  lay-skin="primary" ng-true-value='1' ng-false-value="2">
+				</div>
+			</div>
+
+			<div class="layui-form-item layui-form">
+				<label class="layui-form-label">是否高可用</label>
+				<div class="layui-input-block">
+					<input type="checkbox"  title="是" ng-model="editCluster.isHA" lay-skin="primary" ng-true-value='1' ng-false-value="2">
+				</div>
+			</div>
+
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label"><font color="red">*</font>主机DNS</label>
+				<div class="layui-input-block">
+					<input type="text" ng-model="editCluster.dns" id="edit-dns" placeholder="格式：11.11.11.11,22.22.22.22" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label"><font color="red">*</font>时间同步服务器</label>
+				<div class="layui-input-block">
+					<input type="text" ng-model="editCluster.timeServer" id="edit-timeserver" placeholder="格式：11.11.11.11" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label">描述信息</label>
+				<div class="layui-input-block">
+					<textarea ng-model="editCluster.description" maxlength="512" id="edit-description" class="layui-textarea"></textarea>
+				</div>
+			</div>
+
+			<div class="f-right">
+				<button type="button" class="layui-btn layui-btn-small layui-btn-confirm" ng-click="updateCluster($event)">保存</button>
+				<button type="button" class="layui-btn layui-btn-small layui-btn-primary" onclick="closeLayer()">取消</button>
+			</div>
+			</div>
+		</form>
+	</div>
+</body>
+
+<script src="../common/js/jquery.min.js"></script>
+<script src="../common/js/angular-1.6.5/angular.min.js"></script>
+<script src="../common/js/angular-1.6.5/angular-resource.js"></script>
+<script src="../common/ui/layui/lay/dest/layui.all.js"></script>
+<script src="../common/js/common.js"></script>
+<script src="./js/resources.js"></script>
+<script src="./js/common.js"></script>
+<script src="./js/index.js"></script>
+
+
+
+</html>
